@@ -1,4 +1,4 @@
-from typing import Optional, List
+﻿from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 from pydantic import Field
@@ -17,6 +17,9 @@ class CreateGroupRequest(BaseDTO):
     avatar_url: Optional[str] = None
     member_ids: List[str] = []
     announcement_only: bool = False
+
+class UpdateGroupMemberRoleRequest(BaseDTO):
+    new_role: GroupRole
 
 class GroupMemberDTO(TimestampedModel):
     group_id: str
