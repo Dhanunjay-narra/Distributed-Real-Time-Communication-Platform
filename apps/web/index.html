@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot — Distributed Real-Time Communication Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased overflow-hidden selection:bg-indigo-600 selection:text-white">
+
+  <!-- 1. LOGIN SCREEN -->
+  <div id="loginScreen" class="flex min-h-screen items-center justify-center bg-slate-950 p-4">
+    <div class="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-xl">
+      <div class="flex flex-col items-center text-center">
+        <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-lg shadow-indigo-500/30 text-3xl">
+          💬
+        </div>
+        <h1 class="mt-4 text-2xl font-bold tracking-tight text-white">Chatbot Platform</h1>
+        <p class="mt-1 text-xs text-slate-400">Distributed Real-Time Communication Platform</p>
+      </div>
+
+      <div class="mt-6 rounded-2xl border border-indigo-500/30 bg-indigo-950/40 p-4 text-center">
+        <span class="text-xs font-semibold text-indigo-300">⚡ Instant 1-Click Access</span>
+        <p class="text-[11px] text-slate-400 mt-1">Credentials pre-filled with verified test account.</p>
+        <button id="quickLoginBtn" onclick="login()" class="mt-3 w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-600/40 hover:from-indigo-500 hover:to-violet-500 active:scale-[0.98] transition-all cursor-pointer">
+          🚀 1-Click Login & Enter Platform
+        </button>
+      </div>
+
+      <div class="mt-6 space-y-4">
+        <div>
+          <label class="text-xs font-medium text-slate-300">Phone Number / Username</label>
+          <input type="text" id="phoneInput" value="+1 (555) 019-2834" class="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none transition" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-slate-300">Password / Auth Key</label>
+          <input type="password" id="passInput" value="Password123!" class="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-950/60 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none transition" />
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between text-xs text-slate-400">
+        <span class="flex items-center gap-1.5">
+          <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
+          All 23 microservices active
+        </span>
+        <button onclick="login()" class="text-indigo-400 hover:underline">
+          Standard Login →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MAIN APPLICATION -->
+  <div id="appContainer" class="hidden flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
+    <div id="sideNav" class="flex w-16 flex-col items-center justify-between border-r border-slate-800 bg-slate-900/90 py-5">
+      <div class="flex flex-col items-center gap-6">
+        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-md text-xl cursor-pointer">
+          💬
+        </div>
+        <div class="flex flex-col gap-3">
+          <button onclick="switchTab('chats')" id="nav-chats" title="Chats" class="nav-btn flex h-11 w-11 items-center justify-center rounded-xl text-lg bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-105 transition-all">💭</button>
+          <button onclick="switchTab('calls')" id="nav-calls" title="Calls" class="nav-btn flex h-11 w-11 items-center justify-center rounded-xl text-lg text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">📞</button>
+          <button onclick="switchTab('contacts')" id="nav-contacts" title="Contacts" class="nav-btn flex h-11 w-11 items-center justify-center rounded-xl text-lg text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">👥</button>
+          <button onclick="switchTab('status')" id="nav-status" title="Status" class="nav-btn flex h-11 w-11 items-center justify-center rounded-xl text-lg text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">⭕</button>
+          <button onclick="switchTab('admin')" id="nav-admin" title="Admin" class="nav-btn flex h-11 w-11 items-center justify-center rounded-xl text-lg text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">📊</button>
+        </div>
+      </div>
+      <div class="flex flex-col items-center gap-3">
+        <button onclick="toggleTheme()" id="themeBtn" title="Toggle Theme" class="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">☀️</button>
+        <button onclick="switchTab('settings')" id="nav-settings" title="Settings" class="nav-btn flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">⚙️</button>
+        <button onclick="logout()" title="Logout" class="flex h-10 w-10 items-center justify-center rounded-xl text-rose-400 hover:bg-rose-950/40 transition">🚪</button>
+      </div>
+    </div>
+
+    <!-- TAB 1: CHATS VIEW -->
+    <div id="tab-chats-view" class="tab-view flex flex-1 overflow-hidden">
+      <div class="flex w-80 flex-col border-r border-slate-800 bg-slate-900/40">
+        <div class="p-4 border-b border-slate-800/50">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xl font-bold tracking-tight">Messages</h2>
+            <button onclick="addNewChat()" class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white transition font-bold" title="New Chat">+</button>
+          </div>
+          <input type="text" id="chatSearch" oninput="filterConversations()" placeholder="Search conversations..." class="w-full rounded-xl border border-slate-700/60 bg-slate-950/60 px-3.5 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none" />
+          <div class="mt-3 flex gap-1">
+            <button onclick="setFilter('all')" id="flt-all" class="flt-btn rounded-lg px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider bg-indigo-600 text-white transition">All</button>
+            <button onclick="setFilter('unread')" id="flt-unread" class="flt-btn rounded-lg px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">Unread</button>
+            <button onclick="setFilter('groups')" id="flt-groups" class="flt-btn rounded-lg px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">Groups</button>
+          </div>
+        </div>
+        <div id="conversationList" class="flex-1 overflow-y-auto divide-y divide-slate-800/30 p-2 space-y-1"></div>
+      </div>
+
+      <div class="flex flex-1 flex-col overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-800 bg-slate-900/60 px-6 py-4">
+          <div class="flex items-center gap-3">
+            <div id="activeChatAvatar" class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-xl">🌐</div>
+            <div>
+              <h3 id="activeChatName" class="font-bold text-sm leading-tight">Distributed Systems Core</h3>
+              <p id="activeChatStatus" class="text-[11px] text-slate-400 flex items-center gap-1.5">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Active now (End-to-End Encrypted 🔒)
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="startCall('audio')" class="rounded-xl border border-slate-700 bg-slate-800/80 p-2 text-slate-200 hover:bg-slate-700 hover:text-white transition" title="Voice Call">📞</button>
+            <button onclick="startCall('video')" class="rounded-xl border border-slate-700 bg-slate-800/80 p-2 text-slate-200 hover:bg-slate-700 hover:text-white transition" title="Video Call">📹</button>
+            <button onclick="toggleGroupDrawer()" class="rounded-xl border border-slate-700 bg-slate-800/80 p-2 text-slate-200 hover:bg-slate-700 hover:text-white transition" title="Details">ℹ️</button>
+          </div>
+        </div>
+
+        <div id="messagesContainer" class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-950/90"></div>
+
+        <div class="p-4 border-t border-slate-800 bg-slate-900/70">
+          <div id="recordingBox" class="hidden flex items-center justify-between rounded-2xl bg-rose-950/40 border border-rose-800/60 p-3">
+            <div class="flex items-center gap-3">
+              <span class="h-3 w-3 rounded-full bg-rose-500 animate-ping"></span>
+              <span id="recordingTimer" class="text-xs font-semibold text-rose-400">Recording Voice Note... 0:04</span>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="cancelVoiceNote()" class="rounded-xl px-4 py-1.5 text-xs font-medium text-slate-400 hover:bg-slate-800">Cancel</button>
+              <button onclick="sendVoiceNote()" class="rounded-xl bg-rose-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-rose-500 shadow">Send Audio 📤</button>
+            </div>
+          </div>
+
+          <div id="normalInputBox" class="flex items-center gap-2">
+            <button onclick="alert('Attachment: Images, Documents & Media up to 100MB supported.')" class="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">📎</button>
+            <input type="text" id="messageInput" onkeydown="if(event.key==='Enter') sendMessage()" placeholder="Type a message or paste a link..." class="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none transition" />
+            <button onclick="startVoiceRecording()" class="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition">🎙️</button>
+            <button onclick="sendMessage()" class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-600/30 hover:bg-indigo-500 transition">➤</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="groupInfoDrawer" class="hidden w-72 border-l border-slate-800 bg-slate-900/90 p-5 overflow-y-auto space-y-4">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+          <h3 class="font-bold text-sm">Conversation Info</h3>
+          <button onclick="toggleGroupDrawer()" class="text-slate-400 hover:text-white">✕</button>
+        </div>
+        <div class="flex flex-col items-center text-center">
+          <div id="drawerAvatar" class="text-4xl p-3 bg-slate-800 rounded-2xl mb-2">🌐</div>
+          <h4 id="drawerName" class="font-semibold text-sm">Distributed Systems Core</h4>
+          <p id="drawerSubtitle" class="text-xs text-slate-400 mt-1">Group • 14 Members</p>
+        </div>
+        <div class="rounded-xl bg-slate-950 p-3 text-xs space-y-2">
+          <div class="flex justify-between text-slate-400">
+            <span>Security:</span>
+            <span class="text-emerald-400 font-semibold">Signal Double Ratchet E2EE</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Transport:</span>
+            <span class="text-indigo-400">Partitioned Kafka Gateway</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: CALLS -->
+    <div id="tab-calls-view" class="tab-view hidden flex-1 p-8 overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-2xl font-bold">Voice & Video Calls</h2>
+          <p class="text-xs text-slate-400 mt-1">WebRTC Mesh with SDP Offer/Answer Relay</p>
+        </div>
+        <button onclick="startCall('video', 'Conference Room Alpha')" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-md hover:bg-indigo-500">+ Start Multi-Party Call</button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl p-2 bg-slate-800 rounded-xl">👩‍💻</div>
+            <div>
+              <h4 class="font-semibold text-sm">Sarah Jenkins</h4>
+              <p class="text-xs text-slate-400">Video Call • Today, 11:40 AM</p>
+              <span class="text-[10px] text-emerald-400 font-medium">Answered • HD Opus</span>
+            </div>
+          </div>
+          <button onclick="startCall('video', 'Sarah Jenkins')" class="rounded-xl bg-slate-800 p-2.5 hover:bg-indigo-600 hover:text-white transition">📹</button>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl p-2 bg-slate-800 rounded-xl">🌐</div>
+            <div>
+              <h4 class="font-semibold text-sm">Distributed Systems Core</h4>
+              <p class="text-xs text-slate-400">Conference • Yesterday, 4:00 PM</p>
+              <span class="text-[10px] text-slate-400 font-medium">Completed (32m)</span>
+            </div>
+          </div>
+          <button onclick="startCall('audio', 'Distributed Systems Core')" class="rounded-xl bg-slate-800 p-2.5 hover:bg-indigo-600 hover:text-white transition">📞</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: CONTACTS -->
+    <div id="tab-contacts-view" class="tab-view hidden flex-1 p-8 overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-2">Contacts Address Book</h2>
+      <p class="text-xs text-slate-400 mb-6">Social Graph & Discovery with Privacy Controls</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl p-2 bg-slate-800 rounded-xl">👩‍💻</div>
+            <div>
+              <h4 class="font-semibold text-sm">Sarah Jenkins</h4>
+              <p class="text-xs text-slate-400">Principal Systems Architect</p>
+              <span class="text-[10px] font-semibold text-emerald-400">● Online</span>
+            </div>
+          </div>
+          <button onclick="selectContactAndChat('c2')" class="rounded-xl bg-indigo-600/20 text-indigo-400 px-3 py-1.5 text-xs font-semibold hover:bg-indigo-600 hover:text-white transition">Chat</button>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl p-2 bg-slate-800 rounded-xl">👨‍💻</div>
+            <div>
+              <h4 class="font-semibold text-sm">Alex Rivers</h4>
+              <p class="text-xs text-slate-400">Senior Distributed Engineer</p>
+              <span class="text-[10px] font-semibold text-emerald-400">● Online</span>
+            </div>
+          </div>
+          <button onclick="selectContactAndChat('c1')" class="rounded-xl bg-indigo-600/20 text-indigo-400 px-3 py-1.5 text-xs font-semibold hover:bg-indigo-600 hover:text-white transition">Chat</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: STATUS -->
+    <div id="tab-status-view" class="tab-view hidden flex-1 p-8 overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-2">Status & Ephemeral Stories</h2>
+      <p class="text-xs text-slate-400 mb-6">24-hour self-destructing status updates with encryption</p>
+      <div class="flex gap-4">
+        <div onclick="alert('Status Composer: Share photos, videos or text stories.')" class="w-56 h-80 rounded-3xl border-2 border-dashed border-indigo-500/50 bg-indigo-950/20 p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-indigo-950/40 transition">
+          <span class="text-3xl mb-2 text-indigo-400">+</span>
+          <h4 class="font-bold text-sm">Add New Status</h4>
+          <p class="text-[10px] text-slate-400 mt-1">Share photo, video or text</p>
+        </div>
+        <div class="w-56 h-80 rounded-3xl border border-slate-800 bg-gradient-to-b from-indigo-900/60 to-slate-900 p-5 flex flex-col justify-between shadow-xl">
+          <span class="text-xs font-bold text-indigo-300">Sarah Jenkins</span>
+          <p class="text-sm font-medium leading-snug">Benchmarked 100k msg/s on Kafka! 🚀</p>
+          <span class="text-[10px] text-slate-400">2h ago • 14 viewers</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: ADMIN -->
+    <div id="tab-admin-view" class="tab-view hidden flex-1 p-8 overflow-y-auto space-y-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">Cluster Operations & Telemetry</h2>
+          <p class="text-xs text-slate-400 mt-1">Real-time health of 23 Bounded Context microservices</p>
+        </div>
+        <span class="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-400 border border-emerald-500/40">● All Systems Operational</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <span class="text-xs text-slate-400">Active WebSockets</span>
+          <h3 class="text-2xl font-bold mt-1 text-indigo-400">48,291</h3>
+          <span class="text-[10px] text-emerald-400 font-semibold">+12.4% Optimal</span>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <span class="text-xs text-slate-400">Kafka Msg/Sec</span>
+          <h3 class="text-2xl font-bold mt-1 text-indigo-400">94,102</h3>
+          <span class="text-[10px] text-emerald-400 font-semibold">+5.1% Flowing</span>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <span class="text-xs text-slate-400">P99 Latency</span>
+          <h3 class="text-2xl font-bold mt-1 text-indigo-400">8.4 ms</h3>
+          <span class="text-[10px] text-emerald-400 font-semibold">Sub-10ms Target</span>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <span class="text-xs text-slate-400">Consensus Quorum</span>
+          <h3 class="text-2xl font-bold mt-1 text-indigo-400">3/3 Nodes</h3>
+          <span class="text-[10px] text-emerald-400 font-semibold">Healthy Raft Leader</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: SETTINGS -->
+    <div id="tab-settings-view" class="tab-view hidden flex-1 p-8 overflow-y-auto max-w-2xl">
+      <h2 class="text-2xl font-bold mb-2">Account & System Settings</h2>
+      <p class="text-xs text-slate-400 mb-6">Manage security, privacy matrix, and application preferences</p>
+      <div class="space-y-4">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 flex justify-between items-center">
+          <div>
+            <h4 class="font-semibold text-sm">Passkey / WebAuthn Hardware Login</h4>
+            <p class="text-xs text-slate-400">FIDO2 biometrics authentication enabled</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-400">Active</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CALLING MODAL -->
+  <div id="callOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 p-4 backdrop-blur-xl">
+    <div class="w-full max-w-lg rounded-3xl border border-slate-800 bg-slate-900 p-8 text-center shadow-2xl flex flex-col items-center">
+      <div id="callTypeIcon" class="flex h-24 w-24 items-center justify-center rounded-3xl bg-indigo-600/30 border-2 border-indigo-500 text-4xl shadow-xl shadow-indigo-600/30 animate-pulse">📞</div>
+      <h3 id="callPeerName" class="text-2xl font-bold mt-4">Sarah Jenkins</h3>
+      <p id="callDuration" class="text-xs text-emerald-400 font-semibold mt-1">Connected • 0:12</p>
+      <span class="text-[10px] text-slate-400 mt-0.5">E2EE Opus HD Audio • WebRTC Mesh</span>
+      <div id="callVideoBox" class="hidden mt-6 h-44 w-full rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center relative overflow-hidden">
+        <span class="text-xs text-slate-500">Live Video Stream (720p 60fps)</span>
+        <div class="absolute top-3 right-3 h-3 w-3 rounded-full bg-emerald-500 animate-ping"></div>
+      </div>
+      <div class="mt-8 flex items-center gap-4">
+        <button id="muteBtn" onclick="toggleMute()" class="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-slate-200 hover:bg-slate-700 text-lg transition">🎙️</button>
+        <button id="camBtn" onclick="toggleCam()" class="hidden flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-slate-200 hover:bg-slate-700 text-lg transition">📷</button>
+        <button onclick="endCall()" class="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-600 text-white text-xl shadow-lg shadow-rose-600/40 hover:bg-rose-500 transition">🛑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. PURE JAVASCRIPT APP LOGIC (NO BABEL, INSTANT RUN) -->
+  <script>
+    let currentChatId = "c1";
+    let activeFilter = "all";
+    let isMuted = false;
+    let isCamOff = false;
+    let callTimerInterval = null;
+    let callSeconds = 0;
+    let isRecording = false;
+    let recordingInterval = null;
+    let recSecs = 0;
+    let currentTheme = "dark";
+
+    const conversations = [
+      {
+        id: "c1",
+        name: "Distributed Systems Core",
+        avatar: "🌐",
+        lastMessage: "Raft consensus election terms & Redlock lease verified.",
+        time: "11:58 AM",
+        unread: 0,
+        isGroup: true,
+        online: true,
+        messages: [
+          { id: "m1", sender: "other", senderName: "Sarah Jenkins", text: "Vector clock sync conflict resolver is running at 12,000 req/s across all nodes.", time: "11:50 AM", reactions: { "🔥": 3, "👍": 2 } },
+          { id: "m2", sender: "other", senderName: "Alex Rivers", text: "WebSocket gateway connections passed 50k concurrent simulated sockets.", time: "11:54 AM", reactions: { "🎉": 4 } },
+          { id: "m3", sender: "me", senderName: "You", text: "Verified end-to-end multi-device replication and DLQ message rerouting.", time: "11:57 AM", reactions: { "❤️": 2 } },
+          { id: "m4", sender: "other", senderName: "David Chen", text: "Raft consensus election terms & Redlock lease verified.", time: "11:58 AM", reactions: {} }
+        ]
+      },
+      {
+        id: "c2",
+        name: "Sarah Jenkins",
+        avatar: "👩‍💻",
+        lastMessage: "Can we review the WebRTC ICE candidate relay?",
+        time: "11:42 AM",
+        unread: 2,
+        isGroup: false,
+        online: true,
+        messages: [
+          { id: "m21", sender: "other", senderName: "Sarah Jenkins", text: "Hey! The WebRTC signaling mesh is looking great.", time: "11:40 AM", reactions: {} },
+          { id: "m22", sender: "other", senderName: "Sarah Jenkins", text: "Can we review the WebRTC ICE candidate relay?", time: "11:42 AM", reactions: {} }
+        ]
+      },
+      {
+        id: "c3",
+        name: "Elena Rostova",
+        avatar: "🚀",
+        lastMessage: "Voice note received (0:24)",
+        time: "10:30 AM",
+        unread: 0,
+        isGroup: false,
+        online: false,
+        messages: [
+          { id: "m31", sender: "me", senderName: "You", text: "Elena, did you check the push notification batcher latency?", time: "10:28 AM", reactions: {} },
+          { id: "m32", sender: "other", senderName: "Elena Rostova", text: "🎵 Voice note received (0:24)", time: "10:30 AM", reactions: { "👍": 1 } }
+        ]
+      }
+    ];
+
+    function login() {
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("appContainer").classList.remove("hidden");
+      renderConversations();
+      renderActiveChat();
+    }
+
+    function logout() {
+      document.getElementById("appContainer").classList.add("hidden");
+      document.getElementById("loginScreen").classList.remove("hidden");
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-view").forEach(el => el.classList.add("hidden"));
+      const target = document.getElementById("tab-" + tabId + "-view");
+      if (target) target.classList.remove("hidden");
+
+      document.querySelectorAll(".nav-btn").forEach(b => {
+        b.className = "nav-btn flex h-11 w-11 items-center justify-center rounded-xl text-lg text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all";
+      });
+      const activeNav = document.getElementById("nav-" + tabId);
+      if (activeNav) {
+        activeNav.className = "nav-btn flex h-11 w-11 items-center justify-center rounded-xl text-lg bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-105 transition-all";
+      }
+    }
+
+    function setFilter(filter) {
+      activeFilter = filter;
+      document.querySelectorAll(".flt-btn").forEach(b => {
+        b.className = "flt-btn rounded-lg px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition";
+      });
+      const btn = document.getElementById("flt-" + filter);
+      if (btn) btn.className = "flt-btn rounded-lg px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider bg-indigo-600 text-white transition";
+      renderConversations();
+    }
+
+    function filterConversations() {
+      renderConversations();
+    }
+
+    function renderConversations() {
+      const q = (document.getElementById("chatSearch")?.value || "").toLowerCase();
+      const listEl = document.getElementById("conversationList");
+      if (!listEl) return;
+      listEl.innerHTML = "";
+
+      const filtered = conversations.filter(c => {
+        const matchesQ = c.name.toLowerCase().includes(q) || c.lastMessage.toLowerCase().includes(q);
+        if (activeFilter === "groups") return matchesQ && c.isGroup;
+        if (activeFilter === "unread") return matchesQ && c.unread > 0;
+        return matchesQ;
+      });
+
+      filtered.forEach(c => {
+        const isActive = c.id === currentChatId;
+        const item = document.createElement("div");
+        item.className = "flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition " + 
+          (isActive ? "bg-indigo-600/20 border border-indigo-500/30" : "hover:bg-slate-800/40");
+        item.onclick = () => {
+          currentChatId = c.id;
+          c.unread = 0;
+          renderConversations();
+          renderActiveChat();
+        };
+
+        item.innerHTML = `
+          <div class="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-2xl">
+            ${c.avatar}
+            ${c.online ? '<span class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-slate-900"></span>' : ''}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-sm truncate">${c.name}</h4>
+              <span class="text-[10px] text-slate-400">${c.time}</span>
+            </div>
+            <p class="text-xs text-slate-400 truncate mt-0.5">${c.lastMessage}</p>
+          </div>
+          ${c.unread > 0 ? `<span class="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">${c.unread}</span>` : ''}
+        `;
+        listEl.appendChild(item);
+      });
+    }
+
+    function renderActiveChat() {
+      const chat = conversations.find(c => c.id === currentChatId) || conversations[0];
+      document.getElementById("activeChatAvatar").innerText = chat.avatar;
+      document.getElementById("activeChatName").innerText = chat.name;
+      document.getElementById("activeChatStatus").innerHTML = chat.online
+        ? '<span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Active now (End-to-End Encrypted 🔒)'
+        : 'Offline • Last seen recently';
+
+      document.getElementById("drawerAvatar").innerText = chat.avatar;
+      document.getElementById("drawerName").innerText = chat.name;
+      document.getElementById("drawerSubtitle").innerText = chat.isGroup ? "Group • 14 Members" : "Direct 1:1 Conversation";
+
+      const msgContainer = document.getElementById("messagesContainer");
+      msgContainer.innerHTML = `
+        <div class="flex justify-center">
+          <span class="rounded-full bg-slate-800/80 px-3.5 py-1 text-[10px] text-slate-400 uppercase tracking-widest font-semibold border border-slate-700/50">
+            🔒 Messages are end-to-end encrypted with Signal Double Ratchet
+          </span>
+        </div>
+      `;
+
+      chat.messages.forEach(msg => {
+        const isMe = msg.sender === "me";
+        const msgWrapper = document.createElement("div");
+        msgWrapper.className = "flex flex-col " + (isMe ? "items-end" : "items-start");
+
+        let reactionHTML = "";
+        if (msg.reactions && Object.keys(msg.reactions).length > 0) {
+          reactionHTML = '<div class="flex gap-1 mt-1">';
+          for (const [emoji, count] of Object.entries(msg.reactions)) {
+            reactionHTML += `<span onclick="addReaction('${msg.id}', '${emoji}')" class="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/80 px-2 py-0.5 text-[10px] text-slate-300 cursor-pointer hover:bg-slate-800"><span>${emoji}</span><span class="font-semibold">${count}</span></span>`;
+          }
+          reactionHTML += '</div>';
+        }
+
+        msgWrapper.innerHTML = `
+          <div class="group relative max-w-lg rounded-2xl p-3.5 shadow-sm transition-all ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-900 border border-slate-800/80 text-slate-100 rounded-bl-none'}">
+            ${!isMe ? `<span class="block text-[11px] font-bold text-indigo-400 mb-1">${msg.senderName}</span>` : ''}
+            <p class="text-sm leading-relaxed whitespace-pre-wrap">${msg.text}</p>
+            <div class="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-75">
+              <span>${msg.time}</span>
+              ${isMe ? '<span>✓✓</span>' : ''}
+            </div>
+            <button onclick="promptReaction('${msg.id}')" class="absolute -top-2 right-2 hidden group-hover:flex rounded-full bg-slate-800 p-1 text-xs shadow-md border border-slate-700 hover:scale-110 transition">😊</button>
+          </div>
+          ${reactionHTML}
+        `;
+        msgContainer.appendChild(msgWrapper);
+      });
+
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const text = (input.value || "").trim();
+      if (!text) return;
+
+      const chat = conversations.find(c => c.id === currentChatId);
+      if (!chat) return;
+
+      const newMsg = {
+        id: "msg_" + Date.now(),
+        sender: "me",
+        senderName: "You",
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        reactions: {}
+      };
+
+      chat.messages.push(newMsg);
+      chat.lastMessage = text;
+      chat.time = newMsg.time;
+      input.value = "";
+
+      renderConversations();
+      renderActiveChat();
+
+      setTimeout(() => {
+        const replies = [
+          "Received via distributed WebSocket cluster with sub-10ms latency!",
+          "Monotonic sequence order confirmed with causal Lamport clock.",
+          "Acknowledged and replicated across multi-region Redis partition."
+        ];
+        const autoMsg = {
+          id: "reply_" + Date.now(),
+          sender: "other",
+          senderName: chat.name,
+          text: replies[Math.floor(Math.random() * replies.length)],
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          reactions: { "❤️": 1 }
+        };
+        chat.messages.push(autoMsg);
+        chat.lastMessage = autoMsg.text;
+        chat.time = autoMsg.time;
+        renderConversations();
+        renderActiveChat();
+      }, 1000);
+    }
+
+    function addReaction(msgId, emoji) {
+      const chat = conversations.find(c => c.id === currentChatId);
+      if (!chat) return;
+      const msg = chat.messages.find(m => m.id === msgId);
+      if (msg) {
+        msg.reactions = msg.reactions || {};
+        msg.reactions[emoji] = (msg.reactions[emoji] || 0) + 1;
+        renderActiveChat();
+      }
+    }
+
+    function promptReaction(msgId) {
+      const emojis = ["❤️", "👍", "😂", "🔥", "🎉", "🙏"];
+      const chosen = emojis[Math.floor(Math.random() * emojis.length)];
+      addReaction(msgId, chosen);
+    }
+
+    function startVoiceRecording() {
+      document.getElementById("normalInputBox").classList.add("hidden");
+      document.getElementById("recordingBox").classList.remove("hidden");
+      recSecs = 0;
+      recordingInterval = setInterval(() => {
+        recSecs++;
+        document.getElementById("recordingTimer").innerText = "Recording Voice Note... 0:0" + recSecs;
+      }, 1000);
+    }
+
+    function cancelVoiceNote() {
+      clearInterval(recordingInterval);
+      document.getElementById("recordingBox").classList.add("hidden");
+      document.getElementById("normalInputBox").classList.remove("hidden");
+    }
+
+    function sendVoiceNote() {
+      clearInterval(recordingInterval);
+      document.getElementById("recordingBox").classList.add("hidden");
+      document.getElementById("normalInputBox").classList.remove("hidden");
+
+      const chat = conversations.find(c => c.id === currentChatId);
+      if (!chat) return;
+
+      const voiceMsg = {
+        id: "voice_" + Date.now(),
+        sender: "me",
+        senderName: "You",
+        text: "🎵 Voice Message (" + (recSecs || 4) + "s)",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        reactions: {}
+      };
+      chat.messages.push(voiceMsg);
+      chat.lastMessage = voiceMsg.text;
+      chat.time = voiceMsg.time;
+      renderConversations();
+      renderActiveChat();
+    }
+
+    function addNewChat() {
+      const name = prompt("Enter contact or group name:");
+      if (name) {
+        const newC = {
+          id: "c_" + Date.now(),
+          name: name,
+          avatar: "👥",
+          lastMessage: "Conversation initialized",
+          time: "Just now",
+          unread: 0,
+          isGroup: true,
+          online: true,
+          messages: []
+        };
+        conversations.unshift(newC);
+        currentChatId = newC.id;
+        renderConversations();
+        renderActiveChat();
+      }
+    }
+
+    function selectContactAndChat(id) {
+      currentChatId = id;
+      switchTab("chats");
+      renderConversations();
+      renderActiveChat();
+    }
+
+    function toggleGroupDrawer() {
+      document.getElementById("groupInfoDrawer").classList.toggle("hidden");
+    }
+
+    function startCall(type, name) {
+      const chat = conversations.find(c => c.id === currentChatId);
+      const peerName = name || (chat ? chat.name : "Peer");
+      document.getElementById("callPeerName").innerText = peerName;
+      document.getElementById("callTypeIcon").innerText = type === "video" ? "📹" : "📞";
+
+      if (type === "video") {
+        document.getElementById("callVideoBox").classList.remove("hidden");
+        document.getElementById("camBtn").classList.remove("hidden");
+      } else {
+        document.getElementById("callVideoBox").classList.add("hidden");
+        document.getElementById("camBtn").classList.add("hidden");
+      }
+
+      callSeconds = 0;
+      document.getElementById("callDuration").innerText = "Connected • 0:00";
+      clearInterval(callTimerInterval);
+      callTimerInterval = setInterval(() => {
+        callSeconds++;
+        const mins = Math.floor(callSeconds / 60);
+        const secs = (callSeconds % 60).toString().padStart(2, "0");
+        document.getElementById("callDuration").innerText = `Connected • ${mins}:${secs}`;
+      }, 1000);
+
+      document.getElementById("callOverlay").classList.remove("hidden");
+    }
+
+    function endCall() {
+      clearInterval(callTimerInterval);
+      document.getElementById("callOverlay").classList.add("hidden");
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById("muteBtn").innerText = isMuted ? "🔇" : "🎙️";
+      document.getElementById("muteBtn").className = isMuted
+        ? "flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-600 text-white text-lg transition"
+        : "flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 text-slate-200 hover:bg-slate-700 text-lg transition";
+    }
+
+    function toggleCam() {
+      isCamOff = !isCamOff;
+      document.getElementById("camBtn").innerText = isCamOff ? "🚫" : "📷";
+      document.getElementById("callVideoBox").style.display = isCamOff ? "none" : "flex";
+    }
+
+    function toggleTheme() {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      document.getElementById("themeBtn").innerText = currentTheme === "dark" ? "☀️" : "🌙";
+    }
+  </script>
+</body>
+</html>
