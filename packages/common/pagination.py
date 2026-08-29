@@ -1,8 +1,9 @@
-import base64, json
+﻿import base64, json
 from typing import Generic, TypeVar, List, Optional, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 T = TypeVar("T")
+
 class Page(BaseModel, Generic[T]):
     items: List[T]
     next_cursor: Optional[str] = None
@@ -19,3 +20,10 @@ class CursorPagination:
         if not cursor: return None
         try: return json.loads(base64.urlsafe_b64decode(cursor.encode()).decode())
         except Exception: return None
+
+class CursorPaginationParams(BaseModel):
+    cursor: Optional[str] = Field(None, description="Opaque cursor token")
+    limit: int = Field(50, ge=1, le=100, description="Items per page")
+    direction: str = Field("forward", description="forward or backward")
+
+PaginatedResult = Page

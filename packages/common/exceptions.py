@@ -1,36 +1,49 @@
-from typing import Any, Dict, Optional
+from typing import Optional, Dict, Any
 
-class ChatbotException(Exception):
-    def __init__(self, message: str, status_code: int = 500, error_code: str = "INTERNAL_SERVER_ERROR", details: Optional[Dict[str, Any]] = None):
+class DomainException(Exception):
+    def __init__(self, message: str, code: str = "DOMAIN_ERROR", status_code: int = 400, details: Optional[Dict[str, Any]] = None):
         super().__init__(message)
-        self.message, self.status_code, self.error_code, self.details = message, status_code, error_code, details or {}
-    def to_dict(self) -> Dict[str, Any]:
-        return {"success": False, "error": {"code": self.error_code, "message": self.message, "details": self.details}}
+        self.message = message
+        self.code = code
+        self.status_code = status_code
+        self.details = details or {}
 
-class NotFoundException(ChatbotException):
-    def __init__(self, message: str = "Resource not found", details: Optional[Dict[str, Any]] = None):
-        super().__init__(message, 404, "NOT_FOUND", details)
+class UnauthorizedException(DomainException):
+    def __init__(self, message: str = "Authentication required or credentials invalid", details: Optional[Dict[str, Any]] = None):
+        super().__init__(message, code="UNAUTHORIZED", status_code=401, details=details)
 
-class UnauthorizedException(ChatbotException):
-    def __init__(self, message: str = "Authentication required", details: Optional[Dict[str, Any]] = None):
-        super().__init__(message, 401, "UNAUTHORIZED", details)
+class ForbiddenException(DomainException):
+    def __init__(self, message: str = "Access to requested resource is forbidden", details: Optional[Dict[str, Any]] = None):
+        super().__init__(message, code="FORBIDDEN", status_code=403, details=details)
 
-class ForbiddenException(ChatbotException):
-    def __init__(self, message: str = "Permission denied", details: Optional[Dict[str, Any]] = None):
-        super().__init__(message, 403, "FORBIDDEN", details)
+class NotFoundException(DomainException):
+    def __init__(self, message: str = "Requested resource does not exist", details: Optional[Dict[str, Any]] = None):
+        super().__init__(message, code="NOT_FOUND", status_code=404, details=details)
 
-class ConflictException(ChatbotException):
-    def __init__(self, message: str = "Resource conflict", details: Optional[Dict[str, Any]] = None):
-        super().__init__(message, 409, "CONFLICT", details)
+class ConflictException(DomainException):
+    def __init__(self, message: str = "Conflict with existing resource state", details: Optional[Dict[str, Any]] = None):
+        super().__init__(message, code="CONFLICT", status_code=409, details=details)
 
-class ValidationException(ChatbotException):
-    def __init__(self, message: str = "Validation failed", details: Optional[Dict[str, Any]] = None):
-        super().__init__(message, 422, "VALIDATION_ERROR", details)
+class ValidationException(DomainException):
+    def __init__(self, message: str = "Request payload validation failed", details: Optional[Dict[str, Any]] = None):
+        super().__init__(message, code="VALIDATION_FAILED", status_code=422, details=details)
 
-class RateLimitException(ChatbotException):
-    def __init__(self, message: str = "Rate limit exceeded", retry_after: int = 60):
-        super().__init__(message, 429, "RATE_LIMIT_EXCEEDED", {"retry_after": retry_after})
+class RateLimitExceededException(DomainException):
+    def __init__(self, message: str = "Too many requests. Please slow down.", retry_after_seconds: int = 60):
+        super().__init__(message, code="RATE_LIMIT_EXCEEDED", status_code=429, details={"retry_after": retry_after_seconds})
 
-class ServiceUnavailableException(ChatbotException):
-    def __init__(self, message: str = "Service temporarily unavailable", details: Optional[Dict[str, Any]] = None):
-        super().__init__(message, 503, "SERVICE_UNAVAILABLE", details)
+class CircuitBreakerOpenException(DomainException):
+    def __init__(self, message: str = "Service circuit breaker is open. Request short-circuited."):
+        super().__init__(message, code="CIRCUIT_BREAKER_OPEN", status_code=503)
+
+class SagaExecutionException(DomainException):
+    def __init__(self, message: str, saga_id: str, failed_step: str):
+        super().__init__(message, code="SAGA_FAILED", status_code=500, details={"saga_id": saga_id, "failed_step": failed_step})
+
+class DistributedLockException(DomainException):
+    def __init__(self, message: str = "Failed to acquire distributed lock lease"):
+        super().__init__(message, code="LOCK_ACQUISITION_FAILED", status_code=503)
+
+ChatbotException = DomainException
+RateLimitException = RateLimitExceededException
+ServiceUnavailableException = CircuitBreakerOpenException

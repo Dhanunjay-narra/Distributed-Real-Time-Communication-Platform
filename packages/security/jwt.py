@@ -35,7 +35,9 @@ def create_access_token(
         "iat": now,
         "exp": expires,
     }
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    secret = getattr(settings, "SECRET_KEY", getattr(settings, "JWT_SECRET_KEY", "secret-key"))
+    algo = getattr(settings, "ALGORITHM", getattr(settings, "JWT_ALGORITHM", "HS256"))
+    return jwt.encode(payload, secret, algorithm=algo)
 
 def create_refresh_token(
     user_id: str,
@@ -52,10 +54,14 @@ def create_refresh_token(
         "iat": now,
         "exp": expires,
     }
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    secret = getattr(settings, "SECRET_KEY", getattr(settings, "JWT_SECRET_KEY", "secret-key"))
+    algo = getattr(settings, "ALGORITHM", getattr(settings, "JWT_ALGORITHM", "HS256"))
+    return jwt.encode(payload, secret, algorithm=algo)
 
 def decode_token(token: str) -> TokenClaims:
+    secret = getattr(settings, "SECRET_KEY", getattr(settings, "JWT_SECRET_KEY", "secret-key"))
+    algo = getattr(settings, "ALGORITHM", getattr(settings, "JWT_ALGORITHM", "HS256"))
     try:
-        return TokenClaims(**jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]))
+        return TokenClaims(**jwt.decode(token, secret, algorithms=[algo]))
     except Exception:
         raise UnauthorizedException("Invalid or expired token")
