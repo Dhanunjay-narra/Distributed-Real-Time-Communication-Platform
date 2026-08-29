@@ -1,4 +1,4 @@
-from typing import Optional
+﻿from typing import Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
 from .models import TimestampedModel, BaseDTO
@@ -20,3 +20,11 @@ class UpdateProfileRequest(BaseDTO):
     avatar_url: Optional[str] = None
     about: Optional[str] = None
     bio: Optional[str] = None
+
+class UserPreferencesDTO(BaseDTO):
+    theme: str = "system"
+    language: str = "en"
+    notifications_enabled: bool = True
+    sound_enabled: bool = True
+    read_receipts_enabled: bool = True
+    typing_indicator_enabled: bool = True
