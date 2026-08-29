@@ -1,12 +1,10 @@
-import uuid
+﻿import uuid
 from datetime import datetime, timezone
 from typing import Optional, Any, Dict
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 class BaseDTO(BaseModel):
-    class Config:
-        from_attributes = True
-        populate_by_name = True
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 class UUIDModel(BaseDTO):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
