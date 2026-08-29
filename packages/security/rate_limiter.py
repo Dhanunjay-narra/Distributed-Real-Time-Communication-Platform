@@ -1,18 +1,38 @@
 import time
-from typing import Optional
-from packages.common.exceptions import RateLimitException
+from typing import Dict, List
+from packages.common.redis_client import get_redis_client
+from packages.common.exceptions import RateLimitExceededException
 
 class DistributedRateLimiter:
-    def __init__(self, redis_manager=None):
-        self.redis_manager = redis_manager
-        self._local_counts = {}
+    def __init__(self):
+        self._memory_windows: Dict[str, List[float]] = {}
 
-    async def check_rate_limit(self, identifier: str, limit: int = 60, window_seconds: int = 60) -> bool:
+    async def check_rate_limit(self, identifier: str, limit: int = 100, window_seconds: int = 60) -> bool:
+        redis = await get_redis_client()
         now = time.time()
-        start = now - window_seconds
-        records = [t for t in self._local_counts.get(identifier, []) if t > start]
-        if len(records) >= limit:
-            raise RateLimitException(retry_after=window_seconds)
-        records.append(now)
-        self._local_counts[identifier] = records
+        key = f"rate:{identifier}"
+
+        # If Redis is active, sliding window via sorted set or counter
+        if redis.client:
+            try:
+                current = await redis.client.incr(key)
+                if current == 1:
+                    await redis.client.expire(key, window_seconds)
+                if current > limit:
+                    raise RateLimitExceededException(retry_after_seconds=window_seconds)
+                return True
+            except RateLimitExceededException:
+                raise
+            except Exception:
+                pass
+
+        # In-memory sliding log fallback
+        timestamps = self._memory_windows.get(identifier, [])
+        timestamps = [t for t in timestamps if now - t < window_seconds]
+        if len(timestamps) >= limit:
+            self._memory_windows[identifier] = timestamps
+            raise RateLimitExceededException(retry_after_seconds=int(window_seconds - (now - timestamps[0])))
+
+        timestamps.append(now)
+        self._memory_windows[identifier] = timestamps
         return True
